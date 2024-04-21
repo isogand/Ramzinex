@@ -1,42 +1,17 @@
-// import i18n from 'i18next';
-// import {initReactI18next} from 'react-i18next';
-// import * as resources from './resources';
-//
-// i18n.use(initReactI18next).init({
-//   compatibilityJSON: 'v3',
-//   resources: {
-//     ...Object.entries(resources).reduce(
-//       (acc, [key, value]) => ({
-//         ...acc,
-//         [key]: {
-//           translation: value,
-//         },
-//       }),
-//       {},
-//     ),
-//   },
-//   fallbackLng: 'en',
-// });
-//
-// export default i18n;
-
-
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import LanguageDetector from "i18next-browser-languagedetector";
-import HttpApi from "i18next-http-backend";
 import axios from "axios";
 
 const loadResources = async (locale) => {
   return await axios
-    .get("https://jsonplaceholder.typicode.com/posts", {
+    .get("http://127.0.0.1:9000/Market%20listings.json", {
       params: { lang: locale },
     })
     .then((res) => {
-      return res.data.slice(0, 3);
+      return res.data.data.slice(0, 3);
     })
     .catch((err) => {
-      console.log(err);
+      console.log("err",err);
     });
 };
 
@@ -71,7 +46,7 @@ const backendOptions = {
         });
       });
     } catch (e) {
-      console.error(e);
+      console.error("e",e);
       callback(null, {
         status: 500,
       });
@@ -80,22 +55,17 @@ const backendOptions = {
 };
 
 i18n
-  // load translation using http -> see /public/locales
-  // learn more: https://github.com/i18next/i18next-http-backend
-  .use(HttpApi)
-  // detect user language
-  // learn more: https://github.com/i18next/i18next-browser-languageDetector
-  .use(LanguageDetector)
-  // pass the i18n instance to react-i18next.
   .use(initReactI18next)
   // init i18next
+// Disable debug mode, which includes logging
   // for all options read: https://www.i18next.com/overview/configuration-options
   .init({
-    debug: true,
+    compatibilityJSON: 'v3',
+    debug: false,
     fallbackLng: "en",
     backend: backendOptions,
     detection: detectorOptions,
-    whitelist: ["en", "zh", "jp", "fr"],
+    whitelist: ["en", "fa"],
     interpolation: {
       escapeValue: false,
     },

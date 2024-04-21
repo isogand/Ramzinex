@@ -1,28 +1,70 @@
-import React from 'react';
-import {ParamListBase, RouteProp} from '@react-navigation/native';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {Box, makeStyles} from '../../../Constants/Theme'
-import {Dimensions} from "react-native";
-import {useSelector} from "react-redux";
-import Header from "../../../components/reusable/Header";
+import React, {ReactNode, useState} from 'react';
+import {Modal, View, Text, StyleSheet, Button} from 'react-native';
+import { Colors } from "../constants/Colors.ts";
+interface CustomModalProps {
+  visible: boolean;
+  onClose: () => void;
+  title: string;
+  children?: ReactNode;
+}
 
-type Props = {
-    route: RouteProp<ParamListBase, string>;
-    navigation: NativeStackNavigationProp<ParamListBase, string>;
+const CustomModal: React.FC<CustomModalProps> = ({
+  visible,
+  onClose,
+  title,
+  children,
+}) => {
+  const [iconColor, setIconColor] = useState('black'); // Initial color of the icon
+
+  const handleIconPress = () => {
+    // Toggle the color of the icon when pressed
+    setIconColor(iconColor === 'black' ? 'green' : 'black');
+  };
+
+  return (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={visible}
+      onRequestClose={onClose}>
+      <View style={styles.modalBackground}>
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalTitle}>{title}</Text>
+          <View style={styles.contentContainer}>{children}</View>
+        </View>
+      </View>
+    </Modal>
+  );
 };
 
-const {height, width} = Dimensions.get('window');
-const  = ({navigation, route}: Props) => {
-    const styles = useStyles();
-    const {theme} = useSelector((state: any) => state.themeReducer);
+const styles = StyleSheet.create({
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContainer: {
+    backgroundColor: Colors.white,
+    borderRadius: 10,
+    padding: 10,
+    alignItems: 'center',
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  iconContainer: {
+    marginBottom: 10,
+  },
+  contentContainer: {
+    // backgroundColor: 'green',
+  },
+  buttonContainer: {
+    marginTop: 10,
+  },
+});
 
-    return (
-        <>
-            <Header variant={"primary"} title={' '} left={{ icon: 'ri-arrow-left-s-line', onPress: () => navigation.goBack() }} />
-
-          
-        </>
-    )
-};
-const useStyles = makeStyles((theme) => ({}));
-export {};
+export default CustomModal;

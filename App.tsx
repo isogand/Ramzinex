@@ -6,113 +6,62 @@
  */
 
 import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
-
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
+import {NavigationContainer} from '@react-navigation/native';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+import {createStackNavigator} from '@react-navigation/stack';
+import {AppRoutes} from './components/Navigation.tsx';
+import {HomeNavigator} from './src/Home';
+import {store} from './store';
+import {Provider, useSelector} from 'react-redux';
+import {StatusBar, View} from 'react-native';
+import {I18nextProvider} from 'react-i18next'; // Import I18nextProvider
+import i18n from './constants/translations'; // Import your i18n instance
+/**
+ * Main component of the application.
+ * Sets up navigation, status bar, and Redux store provider.
+ */
 function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+  // Create a stack navigator for app routes
+  const AppStack = createStackNavigator<AppRoutes>();
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+  // Define the stack navigator component
+  const StackNavigator = () => {
+    // Get theme and dark mode state from Redux store
+    const {isDarkMode, theme} = useSelector((state: any) => state.themeReducer);
+
+    return (
+      // Wrap the stack navigator component in a view with full width and height
+      <View style={{width: '100%', height: '100%'}}>
+        {/* Set status bar properties based on theme and dark mode */}
+        <StatusBar
+          backgroundColor={theme.SECONDARY_BACKGROUND_COLOR}
+          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        />
+        {/* Render the app stack navigator */}
+        <AppStack.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}>
+          <AppStack.Screen name="Home" component={HomeNavigator} />
+        </AppStack.Navigator>
+      </View>
+    );
   };
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    // Wrap the entire application in Redux store provider and navigation container
+    <Provider store={store}>
+      {/* Wrap with I18nextProvider */}
+      <I18nextProvider i18n={i18n}>
+        <NavigationContainer>
+          <SafeAreaProvider>
+            {/* Render the custom stack navigator */}
+            <StackNavigator />
+          </SafeAreaProvider>
+        </NavigationContainer>
+      </I18nextProvider>
+    </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;

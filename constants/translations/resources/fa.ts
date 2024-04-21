@@ -1,6 +1,8 @@
 export default {
   home: {
-    title: 'Anasayfa',
+    title: 'رمزینکس',
+    modalTitle: 'زبان',
+    modalButtonTitle : 'بستن',
     description: 'Burası Anasayfadır',
     buttonEn: 'İngilizceye Çevir',
     buttonTr: 'Türkçeye Çevir',
